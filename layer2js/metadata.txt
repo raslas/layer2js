@@ -1,0 +1,21 @@
+[general]
+name=Layer2js
+qgisMinimumVersion=3.0
+description=Description of the plugin
+version=0.1
+author=Author
+email=rlraslas@gmail.com
+
+about=A QGIS plugin for ...
+
+tracker=https://github.com/author/skoolskus/issues
+repository=https://github.com/author/skoolskus
+
+hasProcessingProvider=no
+tags=python
+
+homepage=https://github.com/author/skoolskus
+category=Plugins
+icon=icon.png
+experimental=True
+deprecated=False
