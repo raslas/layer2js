@@ -6,10 +6,20 @@ import re
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import QFileDialog, QMessageBox
-from qgis.core import QgsProject, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import QgsProject, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsGeometry
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'layer2js_dialog_base.ui'))
+
+
+def _geom_to_nested_list(geom):
+    flat = QgsWkbTypes.flatType(geom.wkbType())
+    if flat == QgsWkbTypes.Polygon:
+        geom = QgsGeometry.fromMultiPolygonXY([geom.asPolygon()])
+    return [
+        [[coord for pt in ring for coord in (round(pt.x(), 5), round(pt.y(), 5))] for ring in polygon]
+        for polygon in geom.asMultiPolygon()
+    ]
 
 
 def _safe_js_name(name):
@@ -67,10 +77,10 @@ class Layer2jsDialog(QtWidgets.QDialog, FORM_CLASS):
             geom = feature.geometry()
             if geom and not geom.isNull():
                 geom.transform(transform)
-                wkt = geom.asWkt()
+                coords = _geom_to_nested_list(geom)
             else:
-                wkt = ''
-            values = [wkt] + [
+                coords = None
+            values = [coords] + [
                 feature[f] if feature[f] is not None else None
                 for f in selected_fields
             ]
